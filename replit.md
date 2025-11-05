@@ -54,15 +54,27 @@ public/
 - Initial project setup with Next.js 16 and React 19
 - Implemented document upload with PDF and TXT support
 - Created in-memory database for documents and comments
-- Integrated OpenAI for document summarization and Q&A
+- Integrated OpenAI for document summarization and Q&A (with dynamic imports)
 - Built responsive UI with Tailwind CSS
 - Set up API routes for all features
+- Added security measures: file type validation, size limits, PDF magic byte verification
+- Fixed OpenAI initialization to work without API key (dynamic imports)
+- Sanitized file uploads to prevent path traversal attacks
+
+## Security Considerations
+- **File Upload**: Only PDF and TXT files allowed (max 10MB)
+- **Path Traversal Protection**: Server-generated filenames (no user input in paths)
+- **PDF Validation**: Magic byte verification (%PDF signature)
+- **MIME Type Validation**: Client-provided MIME types validated with basic checks
+- **Known Limitations**: TXT files trust client MIME type (MVP limitation)
+- **Recommendation for Production**: Implement comprehensive server-side MIME sniffing
 
 ## User Preferences
 None specified yet.
 
 ## Notes
 - Uses in-memory storage (data resets on server restart)
-- OpenAI API key required for AI features (summarization and Q&A)
+- OpenAI API key is optional - app works without it (AI features disabled)
 - Supports PDF and TXT file formats
 - Dev server configured to bind to 0.0.0.0:5000 for Replit compatibility
+- Dynamic imports prevent OpenAI initialization errors when key is missing

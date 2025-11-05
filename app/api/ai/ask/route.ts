@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { answerQuestion } from '@/lib/openai';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import pdf from 'pdf-parse';
@@ -49,6 +48,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { answerQuestion } = await import('@/lib/openai');
     const answer = await answerQuestion(text, question);
     
     return NextResponse.json({ answer });

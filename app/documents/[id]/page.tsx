@@ -1,25 +1,28 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import CommentSection from '@/components/ui/CommentSection';
 import AIAssistant from '@/components/ui/AIAssistant';
 import { Document } from '@/lib/db';
 
-export default function DocumentPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
+export default function DocumentPage() {
+  const params = useParams();
   const router = useRouter();
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
+  const documentId = params.id as string;
 
   useEffect(() => {
-    fetchDocument();
-  }, [resolvedParams.id]);
+    if (documentId) {
+      fetchDocument();
+    }
+  }, [documentId]);
 
   const fetchDocument = async () => {
     try {
-      const response = await fetch(`/api/documents/${resolvedParams.id}`);
+      const response = await fetch(`/api/documents/${documentId}`);
       if (response.ok) {
         const data = await response.json();
         setDocument(data);
