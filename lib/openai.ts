@@ -1,10 +1,14 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 export async function summarizeDocument(text: string): Promise<string> {
+  if (!openai) {
+    throw new Error('OpenAI API key not configured');
+  }
+  
   try {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
@@ -30,6 +34,10 @@ export async function summarizeDocument(text: string): Promise<string> {
 }
 
 export async function answerQuestion(documentText: string, question: string): Promise<string> {
+  if (!openai) {
+    throw new Error('OpenAI API key not configured');
+  }
+  
   try {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
