@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Brain } from 'lucide-react';
 
 interface AIAssistantProps {
   documentId: string;
@@ -13,7 +14,7 @@ export default function AIAssistant({ documentId }: AIAssistantProps) {
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!question.trim()) {
       alert('Please enter a question');
       return;
@@ -50,48 +51,52 @@ export default function AIAssistant({ documentId }: AIAssistantProps) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 rounded-lg p-6 border border-purple-200 dark:border-purple-800">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-        <svg
-          className="w-6 h-6 mr-2 text-purple-600 dark:text-purple-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-          />
-        </svg>
-        Ask AI About This Document
-      </h2>
+    <div className="bg-[#FFFFFF] border border-gray-200 rounded-2xl p-6 shadow-sm w-full max-w-lg mx-auto">
+      {/* Header */}
+      <div className="flex items-center mb-4">
+        <div className="flex items-center justify-center h-10 w-10 bg-[rgb(97,0,165)]/10 rounded-full mr-3">
+          <Brain className="h-5 w-5 text-[rgb(97,0,165)]" />
+        </div>
+        <h2 className="text-lg font-semibold text-[rgb(32,23,73)]">
+          Ask AI About This Document
+        </h2>
+      </div>
 
+      {/* Description */}
+      <p className="text-sm text-[rgb(32,23,73)]/70 mb-5 leading-relaxed">
+        Have a question or need insights from this document? Ask our AI to summarize, explain,
+        or highlight key details for you.
+      </p>
+
+      {/* Form */}
       <form onSubmit={handleAsk} className="space-y-4">
         <div>
           <textarea
             rows={3}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Ask a question about this document..."
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-[rgb(97,0,165)] focus:border-[rgb(97,0,165)] outline-none text-[rgb(32,23,73)] placeholder:text-[rgb(32,23,73)]/40"
+            placeholder="Ask something like “Summarize this section” or “What is the main idea?”"
             disabled={loading}
           />
         </div>
+
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full px-4 py-2.5 text-sm font-medium rounded-full text-white bg-[rgb(97,0,165)] hover:bg-[rgb(120,20,190)] transition-all shadow-sm disabled:opacity-60"
         >
           {loading ? 'Thinking...' : 'Ask AI'}
         </button>
       </form>
 
+      {/* Answer */}
       {answer && (
-        <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-          <h3 className="font-medium text-gray-900 dark:text-white mb-2">Answer:</h3>
-          <p className="text-gray-700 dark:text-gray-300 text-sm whitespace-pre-wrap">
+        <div className="mt-5 p-4 bg-[rgb(97,0,165)]/5 border border-[rgb(97,0,165)]/20 rounded-xl">
+          <h3 className="font-semibold text-[rgb(32,23,73)] mb-2 text-sm">
+            AI’s Response:
+          </h3>
+          <p className="text-[rgb(32,23,73)]/80 text-sm leading-relaxed whitespace-pre-wrap">
             {answer}
           </p>
         </div>

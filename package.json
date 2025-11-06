@@ -11,8 +11,7 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.16",
     "@types/node": "^24.10.0",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
+    "lucide-react": "^0.552.0",
     "next": "^16.0.1",
     "openai": "^6.8.1",
     "pdf-parse": "^1.1.1",
@@ -21,6 +20,8 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
     "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",

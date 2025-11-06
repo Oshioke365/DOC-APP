@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Upload } from 'lucide-react';
 import FileUpload from '@/components/ui/FileUpload';
 import DocumentCard from '@/components/ui/DocumentCard';
 import { Document } from '@/lib/db';
@@ -8,6 +9,7 @@ import { Document } from '@/lib/db';
 export default function Home() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     fetchDocuments();
@@ -26,68 +28,106 @@ export default function Home() {
   };
 
   const handleDelete = (id: string) => {
-    setDocuments(documents.filter(doc => doc.id !== id));
+    setDocuments((docs) => docs.filter((doc) => doc.id !== id));
+  };
+
+  // 🔹 Button click triggers the hidden file input
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Document Collaboration
+    <div className="min-h-screen bg-[#FFFFFF] flex flex-col items-center">
+      <div className="w-full max-w-md px-5 py-8">
+        {/* Header */}
+        <header className="text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-[rgb(32,23,73)] mb-2">
+            Document Hub 📂
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Upload documents, collaborate with comments, and get AI insights
+          <p className="text-[rgb(32,23,73)]/70 text-sm leading-relaxed">
+            Upload, view, and collaborate on important documents — powered by AI
+            insights.
           </p>
         </header>
 
-        <div className="mb-8">
-          <FileUpload onUploadComplete={fetchDocuments} />
+        {/* Upload Section */}
+        <div className="mb-10 p-4 rounded-xl border border-gray-100 shadow-sm bg-white text-center">
+          <h2 className="text-lg font-semibold text-[rgb(32,23,73)] mb-3">
+            Upload a Document
+          </h2>
+          <p className="text-sm text-[rgb(32,23,73)]/70 mb-4 px-3">
+            Tap the button below to select a file from your phone or computer.
+            Once uploaded, others can view, comment, and explore it using AI.
+          </p>
+
+          {/* 🔹 Upload Button that opens file picker */}
+          <div className="flex justify-center">
+            <button
+              onClick={handleUploadClick}
+              className="inline-flex items-center gap-1 px-4 py-1.5 bg-[rgb(97,0,165)] text-white rounded-full shadow hover:bg-[rgb(120,20,190)] transition-all cursor-pointer text-sm font-medium"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Upload File
+            </button>
+
+            {/* Hidden input handled via FileUpload */}
+            <FileUpload onUploadComplete={fetchDocuments} ref={fileInputRef} />
+          </div>
         </div>
 
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-            Your Documents ({documents.length})
-          </h2>
+        {/* Documents Section */}
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-semibold text-[rgb(32,23,73)]">
+              Your Documents
+            </h2>
+            <button
+              onClick={fetchDocuments}
+              className="text-xs px-3 py-1 rounded-full bg-[rgb(97,0,165)] text-white font-medium shadow hover:bg-[rgb(120,20,190)] transition-all"
+            >
+              Refresh
+            </button>
+          </div>
 
+          {/* Loading */}
           {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+            <div className="text-center py-10">
+              <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[rgb(97,0,165)]"></div>
+              <p className="text-sm mt-2 text-[rgb(32,23,73)]/60">
+                Fetching your documents...
+              </p>
             </div>
           ) : documents.length === 0 ? (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                No documents
+            <div className="text-center py-10 bg-white rounded-lg border border-gray-200 shadow-sm">
+              <h3 className="mt-3 text-base font-semibold text-[rgb(32,23,73)]">
+                No documents yet
               </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Get started by uploading your first document.
+              <p className="mt-1 text-sm text-[rgb(32,23,73)]/60 px-4">
+                Upload your first file to get started. You can manage and
+                collaborate on it instantly.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-5">
               {documents.map((doc) => (
-                <DocumentCard
+                <div
                   key={doc.id}
-                  document={doc}
-                  onDelete={handleDelete}
-                />
+                  className="rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all"
+                >
+                  <DocumentCard document={doc} onDelete={handleDelete} />
+                </div>
               ))}
             </div>
           )}
-        </div>
+        </section>
+
+        {/* Footer Help Text */}
+        <footer className="mt-10 text-center text-[rgb(32,23,73)]/60 text-sm">
+          💡 <span className="font-medium">Tip:</span> Tap a document to open,
+          leave comments, or get an AI summary.
+        </footer>
       </div>
     </div>
   );
