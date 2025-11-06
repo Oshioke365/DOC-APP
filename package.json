@@ -20,6 +20,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "autoprefixer": "^10.4.21",
