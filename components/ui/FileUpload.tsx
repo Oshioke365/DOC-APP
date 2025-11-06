@@ -45,10 +45,11 @@ export default function FileUpload({ onUploadComplete }: FileUploadProps) {
     formData.append('file', file);
 
     try {
-      const response = await fetch('/api/documents', {
-        method: 'POST',
-        body: formData,
-      });
+   const response = await fetch('/api/upload', {
+  method: 'POST',
+  body: formData,
+});
+
 
       if (response.ok) {
         onUploadComplete();
