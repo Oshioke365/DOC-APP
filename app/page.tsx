@@ -73,7 +73,7 @@ export default function Home() {
             </button>
 
             {/* Hidden input handled via FileUpload */}
-            <FileUpload onUploadComplete={fetchDocuments} ref={fileInputRef} />
+            <FileUpload onUploadComplete={fetchDocuments}  />
           </div>
         </div>
 
