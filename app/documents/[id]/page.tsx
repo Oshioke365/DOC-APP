@@ -1,174 +1,95 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
-import CommentSection from '@/components/ui/CommentSection';
-import AIAssistant from '@/components/ui/AIAssistant';
-import { Document } from '@/lib/db';
+import { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { Upload } from 'lucide-react';
+import FileUpload from '@/components/ui/FileUpload';
 
-export default function DocumentPage() {
-  const params = useParams();
-  const router = useRouter();
-  const [document, setDocument] = useState<Document | null>(null);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+interface SupabaseFile {
+  name: string;
+  created_at: string;
+}
+
+export default function Home() {
+  const [files, setFiles] = useState<SupabaseFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const documentId = params.id as string;
 
   useEffect(() => {
-    if (documentId) {
-      fetchDocument();
-    }
-  }, [documentId]);
+    fetchFiles();
+  }, []);
 
-  const fetchDocument = async () => {
-    try {
-      const response = await fetch(`/api/documents/${documentId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setDocument(data);
-      } else {
-        alert('Document not found');
-        router.push('/');
-      }
-    } catch (error) {
-      console.error('Error fetching document:', error);
-      alert('Error loading document');
-      router.push('/');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+  const fetchFiles = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.storage.from('uploads').list('', {
+      sortBy: { column: 'created_at', order: 'desc' },
     });
+    if (error) console.error('Error fetching files:', error);
+    else setFiles(data || []);
+    setLoading(false);
   };
-
-  const formatSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white"></div>
-      </div>
-    );
-  }
-
-  if (!document) {
-    return null;
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <Link
-            href="/"
-            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center text-sm"
+    <div className="min-h-screen bg-white flex flex-col items-center">
+      <div className="w-full max-w-md px-5 py-8">
+        <header className="text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-[rgb(32,23,73)] mb-2">
+            Document Hub 📂
+          </h1>
+          <p className="text-[rgb(32,23,73)]/70 text-sm leading-relaxed">
+            Upload, view, and collaborate on documents — stored in Supabase.
+          </p>
+        </header>
+
+        <div className="mb-10 text-center">
+          <button
+            onClick={() => document.getElementById('hidden-upload')?.click()}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[rgb(97,0,165)] text-white rounded-full shadow hover:bg-[rgb(120,20,190)] transition-all"
           >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Documents
-          </Link>
+            <Upload className="h-4 w-4" />
+            Upload File
+          </button>
+          <FileUpload onUploadComplete={fetchFiles} />
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                  <svg
-                    className="w-8 h-8 text-blue-600 dark:text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+        <section>
+          <h2 className="text-lg font-semibold text-[rgb(32,23,73)] mb-3">
+            Your Uploaded Files
+          </h2>
+          {loading ? (
+            <p>Loading...</p>
+          ) : files.length === 0 ? (
+            <p>No files uploaded yet.</p>
+          ) : (
+            <ul className="space-y-3">
+              {files.map((file) => {
+                const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${file.name}`;
+                return (
+                  <li
+                    key={file.name}
+                    className="p-3 border border-gray-200 rounded-lg shadow-sm"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  {document.originalName}
-                </h1>
-                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                  <span>{formatSize(document.size)}</span>
-                  <span>•</span>
-                  <span>{formatDate(document.uploadedAt)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {document.summary && (
-            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-              <h2 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
-                AI Summary
-              </h2>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                {document.summary}
-              </p>
-            </div>
+                    <a
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[rgb(97,0,165)] font-medium hover:underline"
+                    >
+                      {file.name}
+                    </a>
+                    <p className="text-xs text-gray-500">
+                      Uploaded: {new Date(file.created_at).toLocaleString()}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
           )}
-
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <a
-              href={`/uploads/${document.name}`}
-              download={document.originalName}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Download Document
-            </a>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <AIAssistant documentId={document.id} />
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <CommentSection documentId={document.id} />
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   );

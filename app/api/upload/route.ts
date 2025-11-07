@@ -1,31 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-export async function POST(req: NextRequest) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export async function POST(req: Request) {
   try {
     const formData = await req.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file') as File | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const fileName = `${Date.now()}-${file.name}`;
 
-    // Ensure /public/uploads exists
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
+    // Upload file to the "uploads" bucket
+    const { error } = await supabase.storage
+      .from('uploads')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
 
-    // Save file
-    const filePath = path.join(uploadDir, file.name);
-    await writeFile(filePath, buffer);
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-    console.log('✅ File saved at:', filePath);
-    return NextResponse.json({ success: true, file: `/uploads/${file.name}` });
-  } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
+    // Construct public URL for the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from('uploads')
+      .getPublicUrl(fileName);
+
+    return NextResponse.json({ url: publicUrlData.publicUrl });
+  } catch (err) {
+    console.error('Unexpected upload error:', err);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
