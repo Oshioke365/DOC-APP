@@ -54,7 +54,7 @@ export default function Home() {
       <div className="w-full max-w-6xl px-5 py-10">
         {/* Header */}
         <header className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-[rgb(32,23,73)] mb-3">
+          <h1 className="text-4xl r font-extrabold text-[rgb(32,23,73)] mb-3">
             Document Hub 📂
           </h1>
           <p className="text-[rgb(32,23,73)]/70 text-base leading-relaxed">
@@ -62,18 +62,18 @@ export default function Home() {
           </p>
         </header>
 
-        {/* Upload File Box */}
-        <div className="flex justify-center mb-[30px]">
-          <div className="w-60 h-60 border-2 border-dashed border-[rgb(97,0,165)] rounded-2xl flex items-center justify-center shadow-sm hover:shadow-lg transition-all bg-[rgb(97,0,165)]/5">
-            <FileUpload onUploadComplete={fetchFiles} />
-          </div>
-        </div>
+  {/* Upload File Box */}
+<div className="flex justify-center mb-[30px]">
+  <div className="w-60 h-60 border-2 border-dashed border-[rgb(97,0,165)] rounded-2xl flex items-center justify-center shadow-sm hover:shadow-lg transition-all bg-[rgb(97,0,165)]/5 p-[20px]">
+    <FileUpload onUploadComplete={fetchFiles} />
+  </div>
+</div>
 
         {/* View Documents Button */}
         <div className="text-center mb-12">
           <button
             onClick={() => setShowDocuments(!showDocuments)}
-            className="px-10 py-5 text-lg font-semibold text-white bg-[rgb(97,0,165)] rounded-full shadow-lg hover:bg-[rgb(120,20,190)] transition-all"
+            className="px-[20px] py-[20px] text-lg font-semibold text-white bg-[rgb(97,0,165)] rounded-full shadow-lg hover:bg-[rgb(120,20,190)] transition-all"
           >
             {showDocuments ? 'Hide Documents' : 'View Documents'}
           </button>
@@ -115,10 +115,10 @@ export default function Home() {
                       </div>
 
                       {/* Action Buttons (all with white text) */}
-                      <div className="mt-4 flex flex-col gap-2">
+                      <div className="mt-[10px] mb-[10px]  flex flex-col gap-[10px]">
                         <button
                           onClick={() => window.open(fileUrl, '_blank')}
-                          className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all"
+                           className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all"
                         >
                           View
                         </button>
@@ -133,7 +133,7 @@ export default function Home() {
 
                         <button
                           onClick={() => openModal(documentId)}
-                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all"
+                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all pb-16"
                         >
                           Ask AI
                         </button>

@@ -7,6 +7,13 @@
   --foreground: #171717;
 }
 
+button {
+  color: white !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #fffff;
