@@ -73,7 +73,7 @@ export default function Home() {
         <div className="text-center mb-12">
           <button
             onClick={() => setShowDocuments(!showDocuments)}
-            className="px-[20px] py-[20px] text-lg font-semibold text-white bg-[rgb(97,0,165)] rounded-full shadow-lg hover:bg-[rgb(120,20,190)] transition-all"
+            className="px-[20px] py-[20px] text-lg font-semibold text-white bg-[rgb(97,0,165)] rounded-full shadow-lg hover:bg-[rgb(120,20,190)] transition-all cursor-pointer"
           >
             {showDocuments ? 'Hide Documents' : 'View Documents'}
           </button>
@@ -118,7 +118,7 @@ export default function Home() {
                       <div className="mt-[10px] mb-[10px]  flex flex-col gap-[10px]">
                         <button
                           onClick={() => window.open(fileUrl, '_blank')}
-                           className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all"
+                           className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all cursor-pointer"
                         >
                           View
                         </button>
@@ -126,14 +126,14 @@ export default function Home() {
                         <a
                           href={fileUrl}
                           download
-                          className="w-full inline-block px-4 py-2 text-sm font-medium text-center text-white bg-gray-700 rounded-full hover:bg-gray-800 transition-all"
+                          className="w-full inline-block px-4 py-2 text-sm font-medium text-center text-white bg-gray-700 rounded-full hover:bg-gray-800 transition-all cursor-pointer"
                         >
                           Download
                         </a>
 
                         <button
                           onClick={() => openModal(documentId)}
-                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all pb-16"
+                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all pb-16 cursor-pointer"
                         >
                           Ask AI
                         </button>
