@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import FileUpload from '@/components/ui/FileUpload';
 import dynamic from 'next/dynamic';
-import { X } from 'lucide-react';
 
 const AIAssistant = dynamic(() => import('@/components/ui/AIAssistant'), {
   ssr: false,
@@ -23,7 +22,7 @@ interface SupabaseFile {
 export default function Home() {
   const [files, setFiles] = useState<SupabaseFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedFile, setSelectedFile] = useState<string | null>(null); // document currently opened in modal
+  const [activeFile, setActiveFile] = useState<string | null>(null); // inline AI toggle
   const [showDocuments, setShowDocuments] = useState(false);
 
   useEffect(() => {
@@ -41,20 +40,12 @@ export default function Home() {
     setLoading(false);
   };
 
-  const openModal = (fileName: string) => {
-    setSelectedFile(fileName);
-  };
-
-  const closeModal = () => {
-    setSelectedFile(null);
-  };
-
   return (
     <div className="min-h-screen bg-white flex flex-col items-center">
       <div className="w-full max-w-6xl px-5 py-10">
         {/* Header */}
         <header className="text-center mb-10">
-          <h1 className="text-4xl r font-extrabold text-[rgb(32,23,73)] mb-3">
+          <h1 className="text-4xl font-extrabold text-[rgb(32,23,73)] mb-3">
             Document Hub 📂
           </h1>
           <p className="text-[rgb(32,23,73)]/70 text-base leading-relaxed">
@@ -62,18 +53,18 @@ export default function Home() {
           </p>
         </header>
 
-  {/* Upload File Box */}
-<div className="flex justify-center mb-[30px]">
-  <div className="w-60 h-60 border-2 border-dashed border-[rgb(97,0,165)] rounded-2xl flex items-center justify-center shadow-sm hover:shadow-lg transition-all bg-[rgb(97,0,165)]/5 p-[20px]">
-    <FileUpload onUploadComplete={fetchFiles} />
-  </div>
-</div>
+        {/* Upload File Box */}
+        <div className="flex justify-center mb-[30px]">
+          <div className="w-60 h-60 border-2 border-dashed border-[rgb(97,0,165)] rounded-2xl flex items-center justify-center shadow-sm hover:shadow-lg transition-all bg-[rgb(97,0,165)]/5 p-[20px]">
+            <FileUpload onUploadComplete={fetchFiles} />
+          </div>
+        </div>
 
         {/* View Documents Button */}
         <div className="text-center mb-12">
           <button
             onClick={() => setShowDocuments(!showDocuments)}
-            className="px-[20px] py-[20px] text-lg font-semibold text-white bg-[rgb(97,0,165)] rounded-full shadow-lg hover:bg-[rgb(120,20,190)] transition-all cursor-pointer"
+            className="px-[20px] py-[20px] text-lg font-semibold text-white bg-[rgb(97,0,165)] rounded-full shadow-lg hover:bg-[rgb(120,20,190)] hover:scale-105 transition-all cursor-pointer"
           >
             {showDocuments ? 'Hide Documents' : 'View Documents'}
           </button>
@@ -95,11 +86,12 @@ export default function Home() {
                 {files.map((file) => {
                   const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${file.name}`;
                   const documentId = file.name;
+                  const isActive = activeFile === documentId;
 
                   return (
                     <div
                       key={file.name}
-                      className="w-[260px] h-[260px] border border-gray-200 rounded-2xl p-5 shadow-md hover:shadow-xl transition-all bg-white flex flex-col justify-between"
+                      className="w-[280px] border border-gray-200 rounded-2xl p-5 shadow-md hover:shadow-xl transition-all bg-white flex flex-col justify-between"
                     >
                       {/* File Info */}
                       <div>
@@ -114,11 +106,11 @@ export default function Home() {
                         </p>
                       </div>
 
-                      {/* Action Buttons (all with white text) */}
-                      <div className="mt-[10px] mb-[10px]  flex flex-col gap-[10px]">
+                      {/* Action Buttons */}
+                      <div className="mt-[10px] flex flex-col gap-[10px]">
                         <button
                           onClick={() => window.open(fileUrl, '_blank')}
-                           className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all cursor-pointer"
+                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all cursor-pointer"
                         >
                           View
                         </button>
@@ -132,42 +124,33 @@ export default function Home() {
                         </a>
 
                         <button
-                          onClick={() => openModal(documentId)}
-                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[rgb(97,0,165)] rounded-full hover:bg-[rgb(120,20,190)] transition-all pb-16 cursor-pointer"
+                          onClick={() =>
+                            setActiveFile(isActive ? null : documentId)
+                          }
+                          className={`w-full px-4 py-2 text-sm font-medium text-white rounded-full transition-all cursor-pointer ${
+                            isActive
+                              ? 'bg-[rgb(120,20,190)]'
+                              : 'bg-[rgb(97,0,165)] hover:bg-[rgb(120,20,190)]'
+                          }`}
                         >
-                          Ask AI
+                          {isActive ? 'Close AI' : 'Ask AI'}
                         </button>
                       </div>
+
+                      {/* Inline AI Assistant */}
+                      {isActive && (
+                        <div className="mt-5 border-t border-gray-200 pt-4 animate-fadeIn">
+                          <div className="text-sm text-gray-800 overflow-y-auto max-h-[300px] bg-gray-50 rounded-xl p-3">
+                            <AIAssistant documentId={documentId} />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
             )}
           </section>
-        )}
-
-        {/* AI Modal (centered) */}
-        {selectedFile && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* backdrop */}
-            <div
-              className="absolute inset-0 bg-black/50"
-              onClick={closeModal}
-              aria-hidden
-            />
-            {/* modal card */}
-            <div className="relative z-10 w-full max-w-lg p-6 bg-white rounded-2xl shadow-2xl animate-fadeIn">
-              <button
-                onClick={closeModal}
-                aria-label="Close AI modal"
-                className="absolute top-3 right-3 text-gray-600 hover:text-gray-800 text-xl"
-              >
-                <X />
-              </button>
-
-              <AIAssistant documentId={selectedFile} />
-            </div>
-          </div>
         )}
       </div>
     </div>
