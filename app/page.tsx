@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import FileUpload from '@/components/ui/FileUpload';
 import dynamic from 'next/dynamic';
+import MarkdownEditor from '@/components/ui/MarkdownEditor';
+
 
 const AIAssistant = dynamic(() => import('@/components/ui/AIAssistant'), {
   ssr: false,
@@ -150,6 +152,9 @@ export default function Home() {
                 })}
               </div>
             )}
+            {/* Markdown Editor Section */}
+<MarkdownEditor />
+
           </section>
         )}
       </div>
